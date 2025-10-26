@@ -893,7 +893,7 @@
         ];
 
         const columns = [
-            { key: 'rank', label: 'Rank', visible: true, sortable: false },
+            { key: 'rank', label: 'Rank', visible: true, sortable: true },
             { key: 'name', label: 'School Name', visible: true, sortable: false },
             { key: 'cumulativeScore', label: 'Cumulative Score', visible: true, sortable: true },
             { key: 'openHouse', label: 'Open House', visible: true, sortable: false },
@@ -1607,6 +1607,7 @@
             header.innerHTML = '';
 
             const percentageColumns = ['principalEffective', 'teacherRecommend', 'mathScore', 'readingScore', 'feelSafe', 'bullyingConcern', 'percentWhite'];
+            const centeredColumns = ['rank', 'cumulativeScore', ...percentageColumns];
 
             columns.forEach(col => {
                 const th = document.createElement('th');
@@ -1629,7 +1630,7 @@
                     th.textContent = col.label;
                 }
 
-                if (percentageColumns.includes(col.key)) {
+                if (centeredColumns.includes(col.key)) {
                     th.style.textAlign = 'center';
                 }
                 header.appendChild(th);
@@ -1649,6 +1650,9 @@
                     if (currentSort.column === 'cumulativeScore') {
                         aVal = calculateCumulativeScore(a);
                         bVal = calculateCumulativeScore(b);
+                    } else if (currentSort.column === 'rank') {
+                        aVal = a.rankings[currentUser] || 999;
+                        bVal = b.rankings[currentUser] || 999;
                     } else {
                         aVal = parseFloat(a[currentSort.column]) || 0;
                         bVal = parseFloat(b[currentSort.column]) || 0;
@@ -1796,24 +1800,53 @@
 
         // Initialize
         loadData();
-        
-        // Validate that all schools have valid rankings for current user
-        let needsReinitialization = false;
-        schools.forEach(school => {
-            if (!school.rankings || !school.rankings[currentUser] || typeof school.rankings[currentUser] !== 'number') {
-                needsReinitialization = true;
-            }
-        });
-        
-        if (needsReinitialization) {
-            console.log('Reinitializing rankings...');
-            schools.forEach((school, index) => {
-                school.rankings = {
-                    mom: index + 1,
-                    dad: index + 1,
-                    rowan: index + 1
-                };
+
+        // Function to fix duplicate rankings for a specific user
+        function fixDuplicateRankings(user) {
+            // Get all schools with valid rankings for this user
+            const schoolsWithRankings = schools.filter(s =>
+                s.rankings && typeof s.rankings[user] === 'number'
+            );
+
+            // Check for duplicates
+            const rankCounts = {};
+            schoolsWithRankings.forEach(school => {
+                const rank = school.rankings[user];
+                rankCounts[rank] = (rankCounts[rank] || 0) + 1;
             });
+
+            const hasDuplicates = Object.values(rankCounts).some(count => count > 1);
+
+            if (hasDuplicates || schoolsWithRankings.length !== schools.length) {
+                console.log(`Fixing rankings for ${user}...`);
+                // Sort by current rank (preserving relative order where possible)
+                const sorted = [...schools].sort((a, b) => {
+                    const aRank = (a.rankings && a.rankings[user]) || 999;
+                    const bRank = (b.rankings && b.rankings[user]) || 999;
+                    return aRank - bRank;
+                });
+
+                // Assign sequential rankings
+                sorted.forEach((school, index) => {
+                    if (!school.rankings) {
+                        school.rankings = { mom: null, dad: null, rowan: null };
+                    }
+                    school.rankings[user] = index + 1;
+                });
+
+                return true;
+            }
+
+            return false;
+        }
+
+        // Fix rankings for all users
+        let needsSaving = false;
+        needsSaving = fixDuplicateRankings('mom') || needsSaving;
+        needsSaving = fixDuplicateRankings('dad') || needsSaving;
+        needsSaving = fixDuplicateRankings('rowan') || needsSaving;
+
+        if (needsSaving) {
             saveRankings();
         }
         
