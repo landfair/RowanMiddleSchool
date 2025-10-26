@@ -174,6 +174,151 @@
             color: #495057;
         }
 
+        .weight-slider-container {
+            margin-bottom: 25px;
+        }
+
+        .weight-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #495057;
+        }
+
+        .weight-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .weight-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .weight-name label {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .weight-value {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 16px;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .weight-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e9ecef;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .weight-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .weight-slider::-webkit-slider-thumb:hover {
+            background: #5568d3;
+            transform: scale(1.1);
+        }
+
+        .weight-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .weight-slider::-moz-range-thumb:hover {
+            background: #5568d3;
+            transform: scale(1.1);
+        }
+
+        .weight-total {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .weight-total-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        .weight-total-value.valid {
+            color: #28a745;
+        }
+
+        .weight-total-value.invalid {
+            color: #dc3545;
+        }
+
+        .weight-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .weight-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .weight-btn-reset {
+            background: #6c757d;
+            color: white;
+        }
+
+        .weight-btn-reset:hover {
+            background: #5a6268;
+        }
+
+        .weight-btn-save {
+            background: #667eea;
+            color: white;
+        }
+
+        .weight-btn-save:hover {
+            background: #5568d3;
+        }
+
+        .weight-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .ranking-list {
             list-style: none;
             padding: 0;
@@ -308,6 +453,43 @@
             text-align: left;
             font-weight: 600;
             white-space: nowrap;
+        }
+
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-right: 30px;
+        }
+
+        th.sortable:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sort-arrows {
+            display: inline-flex;
+            flex-direction: column;
+            margin-left: 5px;
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .sort-arrow {
+            font-size: 10px;
+            line-height: 1;
+            color: rgba(255, 255, 255, 0.4);
+            transition: color 0.2s;
+        }
+
+        .sort-arrow.active {
+            color: white;
+            font-weight: bold;
+        }
+
+        .sort-arrow.up {
+            margin-bottom: 2px;
         }
 
         th.hidden-col {
@@ -544,6 +726,7 @@
             <h1>🎓 Middle School Rankings</h1>
             <div>
                 <button class="avg-rank-btn" onclick="showAverageRankings()">📊 Average Rankings</button>
+                <button class="avg-rank-btn" onclick="showWeightsModal()">⚖️ Adjust Weights</button>
                 <button class="controls-btn" onclick="toggleControls()">☰ Show/Hide Columns</button>
             </div>
         </div>
@@ -599,29 +782,120 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="weightsModal" onclick="closeModalOnOverlay(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚖️ Adjust Category Weights</h2>
+                <button class="modal-close" onclick="closeWeightsModal()">×</button>
+            </div>
+            <p style="color: #6c757d; margin-bottom: 20px; font-size: 14px;">
+                Adjust the importance of each category in the cumulative score. Check multiple items to link them - when you adjust one, the others will automatically adjust to maintain 100%.
+            </p>
+
+            <div class="weight-slider-container">
+                <div class="weight-label">
+                    <span class="weight-name">
+                        <input type="checkbox" class="weight-checkbox" id="check-principal" checked>
+                        <label for="check-principal">Principal Effectiveness</label>
+                    </span>
+                    <span class="weight-value" id="weight-principal-value">16.67%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.1" value="16.666666666666668" class="weight-slider" id="weight-principal" oninput="updateWeightValue('principal')">
+            </div>
+
+            <div class="weight-slider-container">
+                <div class="weight-label">
+                    <span class="weight-name">
+                        <input type="checkbox" class="weight-checkbox" id="check-teacher" checked>
+                        <label for="check-teacher">Teacher Recommendations</label>
+                    </span>
+                    <span class="weight-value" id="weight-teacher-value">16.67%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.1" value="16.666666666666668" class="weight-slider" id="weight-teacher" oninput="updateWeightValue('teacher')">
+            </div>
+
+            <div class="weight-slider-container">
+                <div class="weight-label">
+                    <span class="weight-name">
+                        <input type="checkbox" class="weight-checkbox" id="check-math" checked>
+                        <label for="check-math">Math Scores</label>
+                    </span>
+                    <span class="weight-value" id="weight-math-value">16.67%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.1" value="16.666666666666668" class="weight-slider" id="weight-math" oninput="updateWeightValue('math')">
+            </div>
+
+            <div class="weight-slider-container">
+                <div class="weight-label">
+                    <span class="weight-name">
+                        <input type="checkbox" class="weight-checkbox" id="check-reading" checked>
+                        <label for="check-reading">Reading Scores</label>
+                    </span>
+                    <span class="weight-value" id="weight-reading-value">16.67%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.1" value="16.666666666666668" class="weight-slider" id="weight-reading" oninput="updateWeightValue('reading')">
+            </div>
+
+            <div class="weight-slider-container">
+                <div class="weight-label">
+                    <span class="weight-name">
+                        <input type="checkbox" class="weight-checkbox" id="check-safety" checked>
+                        <label for="check-safety">Student Safety</label>
+                    </span>
+                    <span class="weight-value" id="weight-safety-value">16.67%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.1" value="16.666666666666668" class="weight-slider" id="weight-safety" oninput="updateWeightValue('safety')">
+            </div>
+
+            <div class="weight-slider-container">
+                <div class="weight-label">
+                    <span class="weight-name">
+                        <input type="checkbox" class="weight-checkbox" id="check-bullying" checked>
+                        <label for="check-bullying">Low Bullying (100 - Bullying %)</label>
+                    </span>
+                    <span class="weight-value" id="weight-bullying-value">16.67%</span>
+                </div>
+                <input type="range" min="0" max="100" step="0.1" value="16.666666666666668" class="weight-slider" id="weight-bullying" oninput="updateWeightValue('bullying')">
+            </div>
+
+            <div class="weight-total">
+                Total: <span class="weight-total-value" id="weight-total">100.00%</span>
+            </div>
+
+            <div class="weight-buttons">
+                <button class="weight-btn weight-btn-reset" onclick="resetWeights()">Reset to Equal</button>
+                <button class="weight-btn weight-btn-save" onclick="saveWeights()">Save Weights</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentUser = 'mom'; // Default user
 
         const schools = [
-            {"id":0,"name":"IS 239: Mark Twain","rankings":{"mom":1,"dad":1,"rowan":1},"openHouse":"online only","distance":"31 min drive","category":"Staff Pick","specialSauce":"G&T;  take the test","redFlags":"","startTime":"","studentTeacher":"","insideSchools":"Staff Pick","principalEffective":"86","teacherRecommend":"95","mathScore":"90","readingScore":"97","feelSafe":"78","bullyingConcern":"64","percentWhite":"39","codingClasses":"","offCampusLunch":""},
-            {"id":1,"name":"M.S. 442: Carrol Gardens","rankings":{"mom":2,"dad":2,"rowan":2},"openHouse":"available","distance":"14 min walk","category":"Staff Pick","specialSauce":"two teachers per class; mastery based grading; Maker Lab, intensives tailored to their interests and level","redFlags":"","startTime":"8:00","studentTeacher":"","insideSchools":"Staff Pick","principalEffective":"100","teacherRecommend":"100","mathScore":"81","readingScore":"74","feelSafe":"88","bullyingConcern":"51","percentWhite":"43","codingClasses":"Yes, in technology class","offCampusLunch":"Yes 1 or 2 days/week"},
-            {"id":2,"name":"MS 51 Wiliam Alexander","rankings":{"mom":3,"dad":3,"rowan":3},"openHouse":"scheduled","distance":"25 m bus or subway","category":"Staff Pick","specialSauce":"lots of activities, clubs, trips, homeroom 4x/day, \"many\" students get into top HSs.","redFlags":"","startTime":"","studentTeacher":"","insideSchools":"Staff Pick","principalEffective":"n/a","teacherRecommend":"76","mathScore":"72","readingScore":"61","feelSafe":"76","bullyingConcern":"67","percentWhite":"32","codingClasses":"","offCampusLunch":"daily"},
-            {"id":3,"name":"MS 88: Park Slope Ed Complex","rankings":{"mom":4,"dad":4,"rowan":4},"openHouse":"TBD","distance":"23 min walk","category":"Staff Pick","specialSauce":"accelerated courses; three sub schools (arts, medical, STEM)","redFlags":"","startTime":"","studentTeacher":"","insideSchools":"Staff Pick","principalEffective":"91","teacherRecommend":"90","mathScore":"62","readingScore":"59","feelSafe":"73","bullyingConcern":"69","percentWhite":"46","codingClasses":"yes in SMART house; and Medical","offCampusLunch":""},
-            {"id":4,"name":"Boerum Hill Int'l","rankings":{"mom":5,"dad":5,"rowan":5},"openHouse":"scheduled","distance":"22 min subway","category":"Noteworthy","specialSauce":"IB program; Low homework, 6-12, all kids take french or spanish","redFlags":"lg building shared w/three other MS programs, teachers and students say it is chaotic, not well managed, high teacher turnover","startTime":"","studentTeacher":"","insideSchools":"Noteworthy","principalEffective":"n/a","teacherRecommend":"60","mathScore":"69","readingScore":"64","feelSafe":"84","bullyingConcern":"56","percentWhite":"36","codingClasses":"","offCampusLunch":"Yes"},
-            {"id":5,"name":"Lower Manhattan Community","rankings":{"mom":6,"dad":6,"rowan":6},"openHouse":"scheduled","distance":"29 min bus","category":"Staff Pick","specialSauce":"Low HW; art every day; trips with advisory group","redFlags":"","startTime":"","studentTeacher":"32:1","insideSchools":"Staff Pick","principalEffective":"97","teacherRecommend":"100","mathScore":"70","readingScore":"78","feelSafe":"88","bullyingConcern":"39","percentWhite":"31","codingClasses":"","offCampusLunch":"Daily"},
-            {"id":6,"name":"MS 839","rankings":{"mom":7,"dad":7,"rowan":7},"openHouse":"scheduled","distance":"10 min walk","category":"Noteworthy","specialSauce":"wide variety of electives , \"crew\"-based","redFlags":"Accelerated courses like algebra ,biology. Lots of arts classes including computer digital art. Some say the academics aren't challenging","startTime":"8:45 AM","studentTeacher":"","insideSchools":"Noteworthy","principalEffective":"96","teacherRecommend":"96","mathScore":"62","readingScore":"60","feelSafe":"85","bullyingConcern":"58","percentWhite":"42","codingClasses":"x","offCampusLunch":""},
-            {"id":7,"name":"Brooklyn Collaborative Studies","rankings":{"mom":8,"dad":8,"rowan":8},"openHouse":"","distance":"27 min subway","category":"Staff Pick","specialSauce":"portfolio system, don't take regents (except bio), lots of teacher flexibility for class design,  6-12, outward bound","redFlags":"","startTime":"","studentTeacher":"","insideSchools":"Staff Pick","principalEffective":"90","teacherRecommend":"93","mathScore":"62","readingScore":"51","feelSafe":"72","bullyingConcern":"65","percentWhite":"23","codingClasses":"","offCampusLunch":""},
-            {"id":8,"name":"MS 447 Math and Science Exploratory School","rankings":{"mom":9,"dad":9,"rowan":9},"openHouse":"scheduled","distance":"24 min subway","category":"Staff Pick","specialSauce":"lots of hands on learning, competency based evaluation","redFlags":"","startTime":"","studentTeacher":"","insideSchools":"Staff Pick","principalEffective":"67","teacherRecommend":"78","mathScore":"80","readingScore":"67","feelSafe":"70","bullyingConcern":"64","percentWhite":"42","codingClasses":"","offCampusLunch":""},
-            {"id":9,"name":"BUGS","rankings":{"mom":10,"dad":10,"rowan":10},"openHouse":"scheduled","distance":"14 min walk","category":"Noteworthy","specialSauce":"ecology focus,; quiet time twice a day;  Technology/Graphic Design enrichment classes","redFlags":"","startTime":"8:00","studentTeacher":"28-30:1 but 2 teach in core","insideSchools":"Noteworthy","principalEffective":"72","teacherRecommend":"92","mathScore":"71","readingScore":"79","feelSafe":"87","bullyingConcern":"43","percentWhite":"52","codingClasses":"Tech/graphic design enrichment classes","offCampusLunch":"daily"},
-            {"id":10,"name":"Nest + M","rankings":{"mom":11,"dad":11,"rowan":11},"openHouse":"scheduled","distance":"45 min subway","category":"Staff Pick","specialSauce":"G&T; K-12 (have to be invited to apply based on 4th grade report card)","redFlags":"","startTime":"","studentTeacher":"","insideSchools":"Staff Pick","principalEffective":"92","teacherRecommend":"92","mathScore":"100","readingScore":"99","feelSafe":"93","bullyingConcern":"31","percentWhite":"36","codingClasses":"","offCampusLunch":""},
-            {"id":11,"name":"NYC Lab Middle School (Dist2)","rankings":{"mom":12,"dad":12,"rowan":12},"openHouse":"scheduled","distance":"45 min subway","category":"Staff Pick","specialSauce":"take art 4x/wk, strong SEL, honors/advanced courses","redFlags":"","startTime":"","studentTeacher":"12:1","insideSchools":"Staff Pick","principalEffective":"98","teacherRecommend":"100","mathScore":"92","readingScore":"84","feelSafe":"89","bullyingConcern":"36","percentWhite":"28","codingClasses":"","offCampusLunch":"daily"},
-            {"id":12,"name":"Brooklyn School of Inquiry","rankings":{"mom":13,"dad":13,"rowan":13},"openHouse":"scheduled","distance":"20 min drive","category":"Staff Pick","specialSauce":"G&T; science lab and greenhouse, kids encouraged to share their ideas in Socratic seminar, offers accelerated math like algebra","redFlags":"","startTime":"","studentTeacher":"16:1","insideSchools":"Staff Pick","principalEffective":"89","teacherRecommend":"93","mathScore":"95","readingScore":"89","feelSafe":"84","bullyingConcern":"56","percentWhite":"44","codingClasses":"","offCampusLunch":""},
-            {"id":13,"name":"New Voices","rankings":{"mom":14,"dad":14,"rowan":14},"openHouse":"available","distance":"25 W/ 16 B","category":"Staff Pick","specialSauce":"Strong arts focus, including graphic design.  Seemingly strong science program.  No language in 6 and 7,  French in 8th.  No gym.","redFlags":"No gym, no language in 6th and 7th","startTime":"","studentTeacher":"16:2","insideSchools":"Staff Pick","principalEffective":"96","teacherRecommend":"96","mathScore":"88","readingScore":"80","feelSafe":"82","bullyingConcern":"55","percentWhite":"45","codingClasses":"","offCampusLunch":""}
+            {"id":0,"name":"Nest + M","rankings":{"mom":1,"dad":5,"rowan":1},"openHouse":"scheduled","distance":"45 min subway","category":"Staff Pick","specialSauce":"G&T; K-12 (have to be invited to apply based on 4th grade report card)","redFlags":"","startTime":"","studentTeacher":"","insideSchools":"Staff Pick","principalEffective":"95","teacherRecommend":"97","mathScore":"100","readingScore":"99","feelSafe":"94","bullyingConcern":"32","percentWhite":"36","codingClasses":"","offCampusLunch":""},
+            {"id":1,"name":"Brooklyn School of Inquiry","rankings":{"mom":7,"dad":3,"rowan":1},"openHouse":"scheduled","distance":"20 min drive","category":"Staff Pick","specialSauce":"G&T; science lab and greenhouse, kids encouraged to share their ideas in Socratic seminar, offers accelerated math like algebra","redFlags":"","startTime":"","studentTeacher":"16:1","insideSchools":"Staff Pick","principalEffective":"88","teacherRecommend":"89","mathScore":"95","readingScore":"88","feelSafe":"89","bullyingConcern":"11","percentWhite":"44","codingClasses":"","offCampusLunch":""},
+            {"id":2,"name":"NYC Lab Middle School (Dist2)","rankings":{"mom":8,"dad":8,"rowan":1},"openHouse":"scheduled","distance":"45 min subway","category":"Staff Pick","specialSauce":"take art 4x/wk, strong SEL, honors/advanced courses","redFlags":"","startTime":"","studentTeacher":"12:1","insideSchools":"Staff Pick","principalEffective":"89","teacherRecommend":"94","mathScore":"92","readingScore":"84","feelSafe":"85","bullyingConcern":"53","percentWhite":"28","codingClasses":"","offCampusLunch":"daily"},
+            {"id":3,"name":"IS 239: Mark Twain","rankings":{"mom":1,"dad":5,"rowan":1},"openHouse":"online only","distance":"31 min drive","category":"Staff Pick","specialSauce":"G&T;  take the test","redFlags":"","startTime":"","studentTeacher":"","insideSchools":"Staff Pick","principalEffective":"88","teacherRecommend":"93","mathScore":"90","readingScore":"87","feelSafe":"82","bullyingConcern":"57","percentWhite":"39","codingClasses":"","offCampusLunch":""},
+            {"id":4,"name":"New Voices","rankings":{"mom":1,"dad":2,"rowan":1},"openHouse":"available","distance":"25 W/ 16 B","category":"Staff Pick","specialSauce":"Strong arts focus, including graphic design.  Seemingly strong science program.  No language in 6 and 7,  French in 8th.  No gym.","redFlags":"No gym, no language in 6th and 7th","startTime":"","studentTeacher":"16:2","insideSchools":"Staff Pick","principalEffective":"100","teacherRecommend":"100","mathScore":"88","readingScore":"80","feelSafe":"85","bullyingConcern":"47","percentWhite":"45","codingClasses":"","offCampusLunch":""},
+            {"id":5,"name":"Hellenic","rankings":{"mom":null,"dad":null,"rowan":null},"openHouse":"scheduled","distance":"","category":"Staff Pick","specialSauce":"","redFlags":"","startTime":"","studentTeacher":"","insideSchools":"Staff Pick","principalEffective":"90","teacherRecommend":"98","mathScore":"88","readingScore":"77","feelSafe":"96","bullyingConcern":"31","percentWhite":"44","codingClasses":"","offCampusLunch":""},
+            {"id":6,"name":"M.S. 442: Carrol Gardens","rankings":{"mom":3,"dad":1,"rowan":1},"openHouse":"available","distance":"14 min walk","category":"Staff Pick","specialSauce":"two teachers per class; mastery based grading; Maker Lab, intensives tailored to their interests and level","redFlags":"","startTime":"8:00","studentTeacher":"","insideSchools":"Staff Pick","principalEffective":"96","teacherRecommend":"100","mathScore":"81","readingScore":"74","feelSafe":"90","bullyingConcern":"38","percentWhite":"43","codingClasses":"Yes, in technology class","offCampusLunch":"Yes 1 or 2 days/week"},
+            {"id":7,"name":"MS 447 Math and Science Exploratory School","rankings":{"mom":2,"dad":10,"rowan":6},"openHouse":"scheduled","distance":"24 min subway","category":"Staff Pick","specialSauce":"lots of hands on learning, competency based evaluation","redFlags":"Oddly low reccomendation scores","startTime":"","studentTeacher":"","insideSchools":"Staff Pick","principalEffective":"72","teacherRecommend":"80","mathScore":"80","readingScore":"67","feelSafe":"76","bullyingConcern":"63","percentWhite":"42","codingClasses":"","offCampusLunch":""},
+            {"id":8,"name":"BK prospect Clinton hill","rankings":{"mom":2,"dad":5,"rowan":null},"openHouse":"scheduled","distance":"1 min walk","category":"Noteworthy","specialSauce":"","redFlags":"","startTime":"","studentTeacher":"","insideSchools":"Noteworthy","principalEffective":"67","teacherRecommend":"98","mathScore":"77","readingScore":"76","feelSafe":"88","bullyingConcern":"57","percentWhite":"","codingClasses":"","offCampusLunch":""},
+            {"id":9,"name":"BK Prospect Downtown","rankings":{"mom":null,"dad":9,"rowan":null},"openHouse":"","distance":"","category":"","specialSauce":"","redFlags":"","startTime":"","studentTeacher":"","insideSchools":"","principalEffective":"83","teacherRecommend":"92","mathScore":"80","readingScore":"77","feelSafe":"86","bullyingConcern":"58","percentWhite":"","codingClasses":"","offCampusLunch":""},
+            {"id":10,"name":"MS 51 Wiliam Alexander","rankings":{"mom":4,"dad":6,"rowan":12},"openHouse":"scheduled","distance":"25 m bus or subway","category":"Staff Pick","specialSauce":"lots of activities, clubs, trips, homeroom 4x/day, \"many\" students get into top HSs.","redFlags":"","startTime":"","studentTeacher":"","insideSchools":"Staff Pick","principalEffective":"69","teacherRecommend":"74","mathScore":"72","readingScore":"61","feelSafe":"77","bullyingConcern":"65","percentWhite":"32","codingClasses":"","offCampusLunch":"daily"},
+            {"id":11,"name":"BUGS","rankings":{"mom":6,"dad":3,"rowan":1},"openHouse":"scheduled","distance":"14 min walk","category":"Noteworthy","specialSauce":"ecology focus,; quiet time twice a day;  Technology/Graphic Design enrichment classes","redFlags":"","startTime":"8:00","studentTeacher":"28-30:1 but 2 teach in core","insideSchools":"Noteworthy","principalEffective":"47","teacherRecommend":"87","mathScore":"71","readingScore":"79","feelSafe":"84","bullyingConcern":"39","percentWhite":"52","codingClasses":"Tech/graphic design enrichment classes","offCampusLunch":"daily"},
+            {"id":12,"name":"Lower Manhattan Community","rankings":{"mom":2,"dad":4,"rowan":1},"openHouse":"scheduled","distance":"29 min bus","category":"Staff Pick","specialSauce":"Low HW; art every day; trips with advisory group","redFlags":"","startTime":"","studentTeacher":"32:1","insideSchools":"Staff Pick","principalEffective":"97","teacherRecommend":"97","mathScore":"70","readingScore":"78","feelSafe":"90","bullyingConcern":"38","percentWhite":"31","codingClasses":"","offCampusLunch":"Daily"},
+            {"id":13,"name":"Boerum Hill Int'l","rankings":{"mom":2,"dad":7,"rowan":1},"openHouse":"scheduled","distance":"22 min subway","category":"Noteworthy","specialSauce":"IB program; Low homework, 6-12, all kids take french or spanish","redFlags":"lg building shared w/three other MS programs, teachers and students say it is chaotic, not well managed, high teacher turnover","startTime":"","studentTeacher":"","insideSchools":"Noteworthy","principalEffective":"75","teacherRecommend":"85","mathScore":"69","readingScore":"64","feelSafe":"80","bullyingConcern":"54","percentWhite":"36","codingClasses":"","offCampusLunch":"Yes"},
+            {"id":14,"name":"MS 88: Park Slope Ed Complex","rankings":{"mom":10,"dad":3,"rowan":1},"openHouse":"TBD","distance":"23 min walk","category":"Staff Pick","specialSauce":"accelerated courses; three sub schools (arts, medical, STEM)","redFlags":"","startTime":"","studentTeacher":"","insideSchools":"Staff Pick","principalEffective":"90","teacherRecommend":"96","mathScore":"62","readingScore":"59","feelSafe":"76","bullyingConcern":"66","percentWhite":"46","codingClasses":"yes in SMART house; and Medical","offCampusLunch":""},
+            {"id":15,"name":"Brooklyn Collaborative Studies","rankings":{"mom":1,"dad":3,"rowan":1},"openHouse":"","distance":"27 min subway","category":"Staff Pick","specialSauce":"portfolio system, don't take regents (except bio), lots of teacher flexibility for class design,  6-12, outward bound","redFlags":"","startTime":"","studentTeacher":"","insideSchools":"Staff Pick","principalEffective":"91","teacherRecommend":"91","mathScore":"62","readingScore":"51","feelSafe":"91","bullyingConcern":"38","percentWhite":"23","codingClasses":"","offCampusLunch":""},
+            {"id":16,"name":"MS 839","rankings":{"mom":5,"dad":2,"rowan":1},"openHouse":"scheduled","distance":"10 min walk","category":"Noteworthy","specialSauce":"wide variety of electives , \"crew\"-based","redFlags":"Accelerated courses like algebra ,biology. Lots of arts classes including computer digital art. Some say the academics aren't challenging","startTime":"8:45 AM","studentTeacher":"","insideSchools":"Noteworthy","principalEffective":"75","teacherRecommend":"94","mathScore":"62","readingScore":"60","feelSafe":"87","bullyingConcern":"54","percentWhite":"42","codingClasses":"x","offCampusLunch":""}
         ];
 
         const columns = [
             { key: 'rank', label: 'Rank', visible: true, sortable: false },
             { key: 'name', label: 'School Name', visible: true, sortable: false },
+            { key: 'cumulativeScore', label: 'Cumulative Score', visible: true, sortable: true },
             { key: 'openHouse', label: 'Open House', visible: true, sortable: false },
             { key: 'distance', label: 'Distance', visible: true, sortable: false },
             { key: 'category', label: 'Category', visible: true, sortable: false },
@@ -630,16 +904,32 @@
             { key: 'redFlags', label: 'Red Flags', visible: true, sortable: false },
             { key: 'startTime', label: 'Start Time', visible: true, sortable: false },
             { key: 'studentTeacher', label: 'Student:Teacher', visible: true, sortable: false },
-            { key: 'principalEffective', label: 'Principal Effective (%)', visible: true, sortable: false },
-            { key: 'teacherRecommend', label: 'Teachers Recommend (%)', visible: true, sortable: false },
-            { key: 'mathScore', label: 'Math Scores (%)', visible: true, sortable: false },
-            { key: 'readingScore', label: 'Reading Scores (%)', visible: true, sortable: false },
-            { key: 'feelSafe', label: 'Students Feel Safe (%)', visible: true, sortable: false },
-            { key: 'bullyingConcern', label: 'Bullying Concern (%)', visible: true, sortable: false },
-            { key: 'percentWhite', label: 'White (%)', visible: true, sortable: false },
+            { key: 'principalEffective', label: 'Principal Effective (%)', visible: true, sortable: true },
+            { key: 'teacherRecommend', label: 'Teachers Recommend (%)', visible: true, sortable: true },
+            { key: 'mathScore', label: 'Math Scores (%)', visible: true, sortable: true },
+            { key: 'readingScore', label: 'Reading Scores (%)', visible: true, sortable: true },
+            { key: 'feelSafe', label: 'Students Feel Safe (%)', visible: true, sortable: true },
+            { key: 'bullyingConcern', label: 'Bullying Concern (%)', visible: true, sortable: true },
+            { key: 'percentWhite', label: 'White (%)', visible: true, sortable: true },
             { key: 'codingClasses', label: 'Coding Classes', visible: true, sortable: false },
             { key: 'offCampusLunch', label: 'Off Campus Lunch', visible: true, sortable: false }
         ];
+
+        // Sorting state
+        let currentSort = {
+            column: null,
+            direction: null // 'asc' or 'desc'
+        };
+
+        // Category weights for cumulative score (default: equal weight)
+        let categoryWeights = {
+            principal: 100 / 6,
+            teacher: 100 / 6,
+            math: 100 / 6,
+            reading: 100 / 6,
+            safety: 100 / 6,
+            bullying: 100 / 6
+        };
 
         // Load saved data
         function loadData() {
@@ -706,6 +996,17 @@
                     localStorage.removeItem('columnVisibility');
                 }
             }
+
+            // Load category weights
+            const savedWeights = localStorage.getItem('categoryWeights');
+            if (savedWeights) {
+                try {
+                    categoryWeights = JSON.parse(savedWeights);
+                } catch (e) {
+                    console.error('Error loading category weights:', e);
+                    localStorage.removeItem('categoryWeights');
+                }
+            }
         }
 
         // Save rankings for all users
@@ -727,13 +1028,17 @@
         function switchUser(user) {
             currentUser = user;
             saveCurrentUser();
-            
+
+            // Clear sorting to show user's rankings
+            currentSort.column = null;
+            currentSort.direction = null;
+
             // Update tab active states
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
             });
             document.getElementById('tab-' + user).classList.add('active');
-            
+
             // Re-render table with new user's rankings
             renderTable();
         }
@@ -776,6 +1081,33 @@
             panel.classList.toggle('active');
         }
 
+        // Sort by column
+        function sortByColumn(columnKey, direction) {
+            if (!direction) {
+                // Toggle direction if clicking the same column
+                if (currentSort.column === columnKey) {
+                    if (currentSort.direction === 'desc') {
+                        direction = 'asc';
+                    } else if (currentSort.direction === 'asc') {
+                        // Clear sort
+                        currentSort.column = null;
+                        currentSort.direction = null;
+                        renderTable();
+                        return;
+                    } else {
+                        direction = 'desc';
+                    }
+                } else {
+                    // Default to descending (high to low) for new column
+                    direction = 'desc';
+                }
+            }
+
+            currentSort.column = columnKey;
+            currentSort.direction = direction;
+            renderTable();
+        }
+
         // Calculate average rank for a school
         function calculateAverageRank(school) {
             const ranks = [
@@ -787,14 +1119,45 @@
             return sum / ranks.length;
         }
 
+        // Calculate cumulative score for a school
+        function calculateCumulativeScore(school) {
+            const principal = parseFloat(school.principalEffective) || 0;
+            const teacher = parseFloat(school.teacherRecommend) || 0;
+            const math = parseFloat(school.mathScore) || 0;
+            const reading = parseFloat(school.readingScore) || 0;
+            const safety = parseFloat(school.feelSafe) || 0;
+            const bullying = parseFloat(school.bullyingConcern) || 0;
+            const antibullying = bullying > 0 ? (100 - bullying) : 0;
+
+            // Calculate weighted score
+            const score = (
+                (principal * categoryWeights.principal / 100) +
+                (teacher * categoryWeights.teacher / 100) +
+                (math * categoryWeights.math / 100) +
+                (reading * categoryWeights.reading / 100) +
+                (safety * categoryWeights.safety / 100) +
+                (antibullying * categoryWeights.bullying / 100)
+            );
+
+            return score;
+        }
+
         // Get min and max values for heatmap columns
         function getMinMaxForColumn(columnKey) {
-            const values = schools
-                .map(s => parseFloat(s[columnKey]))
-                .filter(v => !isNaN(v));
-            
+            let values;
+
+            if (columnKey === 'cumulativeScore') {
+                values = schools
+                    .map(s => calculateCumulativeScore(s))
+                    .filter(v => !isNaN(v));
+            } else {
+                values = schools
+                    .map(s => parseFloat(s[columnKey]))
+                    .filter(v => !isNaN(v));
+            }
+
             if (values.length === 0) return { min: 0, max: 100 };
-            
+
             return {
                 min: Math.min(...values),
                 max: Math.max(...values)
@@ -868,13 +1231,211 @@
         function closeModalOnOverlay(event) {
             if (event.target.id === 'avgRankModal') {
                 closeAverageRankings();
+            } else if (event.target.id === 'weightsModal') {
+                closeWeightsModal();
             }
+        }
+
+        // Show weights modal
+        function showWeightsModal() {
+            // Load current weights into sliders
+            document.getElementById('weight-principal').value = categoryWeights.principal;
+            document.getElementById('weight-teacher').value = categoryWeights.teacher;
+            document.getElementById('weight-math').value = categoryWeights.math;
+            document.getElementById('weight-reading').value = categoryWeights.reading;
+            document.getElementById('weight-safety').value = categoryWeights.safety;
+            document.getElementById('weight-bullying').value = categoryWeights.bullying;
+
+            // Initialize previous values
+            previousWeightValues.principal = categoryWeights.principal;
+            previousWeightValues.teacher = categoryWeights.teacher;
+            previousWeightValues.math = categoryWeights.math;
+            previousWeightValues.reading = categoryWeights.reading;
+            previousWeightValues.safety = categoryWeights.safety;
+            previousWeightValues.bullying = categoryWeights.bullying;
+
+            // Update displays (without triggering auto-adjust)
+            document.getElementById('weight-principal-value').textContent = categoryWeights.principal.toFixed(2) + '%';
+            document.getElementById('weight-teacher-value').textContent = categoryWeights.teacher.toFixed(2) + '%';
+            document.getElementById('weight-math-value').textContent = categoryWeights.math.toFixed(2) + '%';
+            document.getElementById('weight-reading-value').textContent = categoryWeights.reading.toFixed(2) + '%';
+            document.getElementById('weight-safety-value').textContent = categoryWeights.safety.toFixed(2) + '%';
+            document.getElementById('weight-bullying-value').textContent = categoryWeights.bullying.toFixed(2) + '%';
+
+            updateWeightTotal();
+
+            document.getElementById('weightsModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close weights modal
+        function closeWeightsModal() {
+            document.getElementById('weightsModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Store previous values for change detection
+        let previousWeightValues = {
+            principal: 100 / 6,
+            teacher: 100 / 6,
+            math: 100 / 6,
+            reading: 100 / 6,
+            safety: 100 / 6,
+            bullying: 100 / 6
+        };
+
+        // Update weight value display and auto-adjust other checked sliders
+        function updateWeightValue(category) {
+            const categories = ['principal', 'teacher', 'math', 'reading', 'safety', 'bullying'];
+            const slider = document.getElementById('weight-' + category);
+            const newValue = parseFloat(slider.value);
+            const oldValue = previousWeightValues[category];
+            const change = newValue - oldValue;
+
+            // Update the display for this slider (rounded for display only)
+            const display = document.getElementById('weight-' + category + '-value');
+            display.textContent = newValue.toFixed(2) + '%';
+
+            // Store new value with full precision
+            previousWeightValues[category] = newValue;
+
+            // Find all checked categories (excluding the current one)
+            const checkedOthers = categories.filter(cat => {
+                if (cat === category) return false; // Exclude the one being adjusted
+                return document.getElementById('check-' + cat).checked;
+            });
+
+            // If there are other checked items, distribute the change among them
+            if (checkedOthers.length > 0 && Math.abs(change) > 0.000001) {
+                const adjustmentPerItem = -change / checkedOthers.length;
+
+                checkedOthers.forEach(cat => {
+                    const otherSlider = document.getElementById('weight-' + cat);
+                    const otherDisplay = document.getElementById('weight-' + cat + '-value');
+                    let otherValue = parseFloat(otherSlider.value) + adjustmentPerItem;
+
+                    // Clamp between 0 and 100
+                    otherValue = Math.max(0, Math.min(100, otherValue));
+
+                    // Store with full precision
+                    otherSlider.value = otherValue;
+                    otherDisplay.textContent = otherValue.toFixed(2) + '%';
+                    previousWeightValues[cat] = otherValue;
+                });
+
+                // Normalize to ensure total equals exactly 100%
+                // This fixes floating point rounding errors
+                const currentTotal = categories.reduce((sum, cat) => {
+                    return sum + parseFloat(document.getElementById('weight-' + cat).value);
+                }, 0);
+
+                const difference = 100 - currentTotal;
+
+                // If there's a rounding difference, add it to the first checked other item
+                if (Math.abs(difference) > 0.000001 && checkedOthers.length > 0) {
+                    const fixCat = checkedOthers[0];
+                    const fixSlider = document.getElementById('weight-' + fixCat);
+                    const fixDisplay = document.getElementById('weight-' + fixCat + '-value');
+                    const fixedValue = parseFloat(fixSlider.value) + difference;
+
+                    fixSlider.value = fixedValue;
+                    fixDisplay.textContent = fixedValue.toFixed(2) + '%';
+                    previousWeightValues[fixCat] = fixedValue;
+                }
+            }
+
+            // Update total
+            updateWeightTotal();
+        }
+
+        // Update total weight display
+        function updateWeightTotal() {
+            const total =
+                parseFloat(document.getElementById('weight-principal').value) +
+                parseFloat(document.getElementById('weight-teacher').value) +
+                parseFloat(document.getElementById('weight-math').value) +
+                parseFloat(document.getElementById('weight-reading').value) +
+                parseFloat(document.getElementById('weight-safety').value) +
+                parseFloat(document.getElementById('weight-bullying').value);
+
+            const totalDisplay = document.getElementById('weight-total');
+            totalDisplay.textContent = total.toFixed(2) + '%';
+
+            // Color code based on validity (small tolerance for floating point precision)
+            totalDisplay.className = 'weight-total-value';
+            if (Math.abs(total - 100) < 0.01) {
+                totalDisplay.classList.add('valid');
+            } else {
+                totalDisplay.classList.add('invalid');
+            }
+        }
+
+        // Reset weights to equal
+        function resetWeights() {
+            const equalWeight = 100 / 6;
+            document.getElementById('weight-principal').value = equalWeight;
+            document.getElementById('weight-teacher').value = equalWeight;
+            document.getElementById('weight-math').value = equalWeight;
+            document.getElementById('weight-reading').value = equalWeight;
+            document.getElementById('weight-safety').value = equalWeight;
+            document.getElementById('weight-bullying').value = equalWeight;
+
+            // Update previous values
+            previousWeightValues.principal = equalWeight;
+            previousWeightValues.teacher = equalWeight;
+            previousWeightValues.math = equalWeight;
+            previousWeightValues.reading = equalWeight;
+            previousWeightValues.safety = equalWeight;
+            previousWeightValues.bullying = equalWeight;
+
+            // Update displays (without triggering auto-adjust)
+            document.getElementById('weight-principal-value').textContent = equalWeight.toFixed(2) + '%';
+            document.getElementById('weight-teacher-value').textContent = equalWeight.toFixed(2) + '%';
+            document.getElementById('weight-math-value').textContent = equalWeight.toFixed(2) + '%';
+            document.getElementById('weight-reading-value').textContent = equalWeight.toFixed(2) + '%';
+            document.getElementById('weight-safety-value').textContent = equalWeight.toFixed(2) + '%';
+            document.getElementById('weight-bullying-value').textContent = equalWeight.toFixed(2) + '%';
+
+            updateWeightTotal();
+        }
+
+        // Save weights
+        function saveWeights() {
+            const total =
+                parseFloat(document.getElementById('weight-principal').value) +
+                parseFloat(document.getElementById('weight-teacher').value) +
+                parseFloat(document.getElementById('weight-math').value) +
+                parseFloat(document.getElementById('weight-reading').value) +
+                parseFloat(document.getElementById('weight-safety').value) +
+                parseFloat(document.getElementById('weight-bullying').value);
+
+            // Check if total is 100 (with small tolerance for floating point)
+            if (Math.abs(total - 100) > 0.01) {
+                alert('Total weight must equal 100%. Current total: ' + total.toFixed(2) + '%');
+                return;
+            }
+
+            // Save to categoryWeights object
+            categoryWeights.principal = parseFloat(document.getElementById('weight-principal').value);
+            categoryWeights.teacher = parseFloat(document.getElementById('weight-teacher').value);
+            categoryWeights.math = parseFloat(document.getElementById('weight-math').value);
+            categoryWeights.reading = parseFloat(document.getElementById('weight-reading').value);
+            categoryWeights.safety = parseFloat(document.getElementById('weight-safety').value);
+            categoryWeights.bullying = parseFloat(document.getElementById('weight-bullying').value);
+
+            // Save to localStorage
+            localStorage.setItem('categoryWeights', JSON.stringify(categoryWeights));
+
+            // Close modal and re-render table
+            closeWeightsModal();
+            renderTable();
         }
 
         // Close modal with Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeAverageRankings();
+                closeWeightsModal();
             }
         });
 
@@ -1049,10 +1610,25 @@
 
             columns.forEach(col => {
                 const th = document.createElement('th');
-                th.textContent = col.label;
+
                 if (!col.visible) {
                     th.className = 'hidden-col';
                 }
+
+                if (col.sortable) {
+                    th.className = (th.className || '') + ' sortable';
+                    th.innerHTML = `
+                        ${col.label}
+                        <span class="sort-arrows">
+                            <span class="sort-arrow up ${currentSort.column === col.key && currentSort.direction === 'asc' ? 'active' : ''}">▲</span>
+                            <span class="sort-arrow down ${currentSort.column === col.key && currentSort.direction === 'desc' ? 'active' : ''}">▼</span>
+                        </span>
+                    `;
+                    th.onclick = () => sortByColumn(col.key);
+                } else {
+                    th.textContent = col.label;
+                }
+
                 if (percentageColumns.includes(col.key)) {
                     th.style.textAlign = 'center';
                 }
@@ -1063,9 +1639,31 @@
         // Render table
         function renderTable() {
             renderHeader();
-            
-            // Sort schools by current user's rank
-            schools.sort((a, b) => a.rankings[currentUser] - b.rankings[currentUser]);
+
+            // Sort schools
+            if (currentSort.column && currentSort.direction) {
+                // Sort by the selected column
+                schools.sort((a, b) => {
+                    let aVal, bVal;
+
+                    if (currentSort.column === 'cumulativeScore') {
+                        aVal = calculateCumulativeScore(a);
+                        bVal = calculateCumulativeScore(b);
+                    } else {
+                        aVal = parseFloat(a[currentSort.column]) || 0;
+                        bVal = parseFloat(b[currentSort.column]) || 0;
+                    }
+
+                    if (currentSort.direction === 'asc') {
+                        return aVal - bVal;
+                    } else {
+                        return bVal - aVal;
+                    }
+                });
+            } else {
+                // Sort by current user's rank
+                schools.sort((a, b) => a.rankings[currentUser] - b.rankings[currentUser]);
+            }
 
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
@@ -1159,6 +1757,14 @@
                                 updateSchoolField(school.id, col.key, this.textContent);
                             });
                             td.appendChild(narrowDiv);
+                            break;
+                        case 'cumulativeScore':
+                            const cumulativeScore = calculateCumulativeScore(school);
+                            td.textContent = cumulativeScore.toFixed(0);
+                            td.style.textAlign = 'center';
+                            td.style.fontWeight = '700';
+                            td.style.fontSize = '16px';
+                            td.style.backgroundColor = getHeatmapColor(cumulativeScore, 'cumulativeScore');
                             break;
                         case 'principalEffective':
                         case 'teacherRecommend':
